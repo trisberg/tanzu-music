@@ -1,11 +1,11 @@
-id: 104dc241-165b-4370-b4ad-0a2336d02254
+id: 8d5538c0-056b-479c-90c6-4c337b6ec19e
 name: spring-music
-timestamp: 2024-10-28T15:04:12.669055Z
-source: INTELLIJ
+timestamp: 2024-10-28T21:58:56.723556Z
+source: TanzuCLI
 username: risbergt
 options:
   deploymentType: tpfork8s
-  persistenceType: jpa
   includeBuildToolWrapper: true
   javaVersion: "21"
+  persistenceType: jpa
   projectName: tanzu-music

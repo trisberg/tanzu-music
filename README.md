@@ -83,40 +83,13 @@ If you want to expose your application with a domain name and route traffic from
 
 ## Deploying the application to Tanzu Platform for Kubernetes
 
-You can deploy the application as is if you want to use the embedded `H2` database.
-
-You can deploy a MySQL or PostgreSQL instance using a provided service type.
-To list available service types use:
-
-```shell
-tanzu services type list
-```
-
-Create a MySQL database service instance using:
-
-```shell
-tanzu services create MySQLInstance/music
-```
-
-Create a PostgreSQL database service instance using:
-
-```shell
-tanzu services create PostgreSQLInstance/music
-```
-
-You can list the services you have created using:
-
-```shell
-tanzu services list
-```
-
 ### Build and deploy the app
 
 Change to the root directory of your generated app.
 
 #### Configure service binding for the app
 
-Define the service binding name and type using:
+For MySQL and PostgreSQL it is necessary to define the service binding name and type plus setting the active Spring profile.
 
 If you are using MySQL then use:
 
@@ -150,19 +123,38 @@ Start the app deployment by running:
 tanzu deploy --from-build ./prebuilt
 ```
 
-#### Bind your service to the deployed app
+### Create the service and bind it to the app
 
-If you are using MySQL then use:
 
-```shell
-tanzu service bind MySQLInstance/music ContainerApp/tanzu-music --as music
-```
+You can deploy the application as is if you want to use the embedded `H2` database.
 
-And, if you are using PostgreSQL then use:
+You can deploy a MySQL or PostgreSQL instance using a provided service type.
+To list available service types use:
 
 ```shell
-tanzu service bind PostgreSQLInstance/music ContainerApp/tanzu-music --as music
+tanzu services type list
 ```
+
+Create a MySQL database service instance using:
+
+```shell
+tanzu services create MySQLInstance/music
+```
+
+Create a PostgreSQL database service instance using:
+
+```shell
+tanzu services create PostgreSQLInstance/music
+```
+
+When prompted, bind the service to your deployed app.
+
+You can list the services you have created using:
+
+```shell
+tanzu services list
+```
+
 
 #### Scale the number of instances
 
