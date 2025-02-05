@@ -1,16 +1,22 @@
 apiVersion: apps.tanzu.vmware.com/v1
 kind: ContainerApp
 metadata:
-  creationTimestamp: null
   name: tanzu-music
 spec:
+  acceptedServiceBindings:
+  - name: music
+    types:
+    - postgresql
   build:
     buildpacks: {}
     nonSecretEnv:
     - name: BP_JVM_VERSION
       value: "21"
     path: ../..
+  nonSecretEnv:
+  - name: SPRING_PROFILES_ACTIVE
+    value: postgres
   ports:
   - name: main
     port: 8080
-  replicas: 0
+  replicas: 1

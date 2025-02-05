@@ -28,47 +28,39 @@ The supported databases are:
 - H2
     - this is an in memory database so it does not need a profile and it gets started during the application startup
 - mysql
-    - add this profile to the java command below `-Dspring.profiles.active=mysql`
+    - add this profile to the java command when starting the app `-Dspring.profiles.active=mysql`
 - postgresql
-    - add this profile to the java command below `-Dspring.profiles.active=postgres`
+    - add this profile to the java command when starting the app `-Dspring.profiles.active=postgres`
 
-The application can be started locally using the following command:
+The application can be started locally using the following configurations and commands.
+
+#### Using PostgreSQL database
+
+First, start a Docker container fpr `postgres`
 
 ```shell
-java -jar build/libs/tanzu-music-1.0.0.jar
+docker run --rm --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password -d postgres
 ```
 
-Or, if you want to specify a profile, then use the following command:
+Then start the application:
 
 ```shell
-java -Dspring.profiles.active=<database-profile> -jar build/libs/tanzu-music-1.0.0.jar
+java -Dspring.profiles.active=postgres -jar build/libs/tanzu-music-1.0.0.jar
 ```
 
 Access the application by opening your browser using the URL [http://localhost:8080](http://localhost:8080)
 
-## Configuring your Tanzu Platform build environment
+## Tanzu Platform deployment
 
 ### Prerequisites
 
-1. Tanzu CLI and the apps plugin v0.2.0 which are provided as part of [Tanzu Platform](https://docs.vmware.com/en/VMware-Tanzu-Platform/index.html). Installation instructions can be found at [VMware Tanzu Platform Product Documentation - Before you begin](https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/create-manage-apps-tanzu-platform-k8s/getting-started-deploy-app-to-space.html#before-you-begin-0).
-
-2. You have access to a space for your project, and you have used `tanzu login` to authenticate and configure your current Tanzu context, and you have set your project and space using `tanzu project use` and `tanzu space use` respectively.
-
-### Configure an image registry to use for building the app
-
-Before you can build your app, you need to specify the registry where the resulting image from the build can be stored.
-
-```sh
-tanzu build config --containerapp-registry REGISTRY
-```
-
-> Where `REGISTRY` is your container image registry location. For example, `my-registry.io/my-corp-apps/{name}` or `docker.io/<your-docker-id>/{name}` if you use Docker Hub. Note that use of literal `{name}` is required, and it will be replaced with your apps name when you build.
-
-## Configuring your app environment
-
-Change to the root directory of your generated app.
+1. Access to [Tanzu Platform](https://docs.vmware.com/en/VMware-Tanzu-Platform/index.html) configured for platform builds.
+1. The latest Tanzu CLI and plugins from `vmware-tanzu/app-developer` group installed. Installation instructions can be found in the Tanzu Platform documentation: [Before you begin](https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/create-manage-apps-tanzu-platform-k8s/getting-started-deploy-app-to-space.html#before-you-begin-0).
+1. You have access to a space for your project and you have used `tanzu login` to authenticate and configure your current Tanzu context and set your project and space using `tanzu project use` and `tanzu space use` respectively.
 
 ### About the ContainerApp
+
+Change to the root directory of your generated app.
 
 The project contains a `ContainerApp` manifest file that can be used when building and deploying the app. To review the content of this file run:
 
@@ -80,88 +72,40 @@ cat .tanzu/config/tanzu-music.yml
 
 If you want to expose your application with a domain name and route traffic from the domain name to the deployed application, see [Adding HTTP Routing to an Application](https://docs.vmware.com/en/VMware-Tanzu-Platform/SaaS/create-manage-apps-tanzu-platform-k8s/how-to-ingress-to-app.html).
 
-
-## Deploying the application to Tanzu Platform for Kubernetes
-
 ### Build and deploy the app
 
 Change to the root directory of your generated app.
 
-#### Configure service binding for the app
-
-For MySQL and PostgreSQL it is necessary to define the service binding name and type plus setting the active Spring profile.
-
-If you are using MySQL then use:
-
-```shell
-tanzu app config servicebinding set music=mysql
-tanzu app config non-secret-env set SPRING_PROFILES_ACTIVE=mysql
-```
-
-And, if you are using PostgreSQL the use:
-
-```shell
-tanzu app config servicebinding set music=postgresql
-tanzu app config non-secret-env set SPRING_PROFILES_ACTIVE=postgres
-```
-
-#### Building from local source
-
-You can build using source on your local disk.
-
-To build the app you can run this command:
+You can build and deploy the app with a single command.
+Just run:
 
 ```sh
-tanzu build --output-dir ./prebuilt
+tanzu deploy
 ```
 
-#### Deploying the app to Tanzu Platform for Kubernetes
+### Check the status of the service bound to the app
 
-Start the app deployment by running:
+The deployment includes a PostgreSQL instance using a provided service type.
+The instance is bound to the app.
 
-```sh
-tanzu deploy --from-build ./prebuilt
-```
-
-### Create the service and bind it to the app
-
-
-You can deploy the application as is if you want to use the embedded `H2` database.
-
-You can deploy a MySQL or PostgreSQL instance using a provided service type.
-To list available service types use:
-
-```shell
-tanzu services type list
-```
-
-Create a MySQL database service instance using:
-
-```shell
-tanzu services create MySQLInstance/music
-```
-
-Create a PostgreSQL database service instance using:
-
-```shell
-tanzu services create PostgreSQLInstance/music
-```
-
-When prompted, bind the service to your deployed app.
-
-You can list the services you have created using:
+You can list the services created using:
 
 ```shell
 tanzu services list
 ```
 
-
-#### Scale the number of instances
-
-Run this command to scale to 1 instance:
+You can show the status of the service using:
 
 ```shell
-tanzu app scale tanzu-music --instances=1
+tanzu services get PostgreSQLInstance/music
+```
+
+### Check the status of the app deployment
+
+You can run this command to see the status of the app deployment:
+
+```shell
+tanzu apps get tanzu-music
 ```
 
 ### Use port-forward to access an app instance
@@ -173,4 +117,6 @@ Use the following command to start the port-forward:
 ```shell
 tanzu app port-forward tanzu-music --port 8080
 ```
+
+Then you can access the app using http://localhost:8080.
 

@@ -1,18 +1,16 @@
 package com.example.music.domain;
 
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 @Entity
 public class Album {
     @Id
+    @UuidGenerator
     @Column(length=40)
-    @GeneratedValue(generator="randomId")
-    @GenericGenerator(name="randomId", strategy="com.example.music.domain.RandomIdGenerator")
     private String id;
 
     private String title;
@@ -20,7 +18,6 @@ public class Album {
     private String releaseYear;
     private String genre;
     private int trackCount;
-    private String albumId;
 
     public Album() {
     }
@@ -78,13 +75,5 @@ public class Album {
 
     public void setTrackCount(int trackCount) {
         this.trackCount = trackCount;
-    }
-
-    public String getAlbumId() {
-        return albumId;
-    }
-
-    public void setAlbumId(String albumId) {
-        this.albumId = albumId;
     }
 }
